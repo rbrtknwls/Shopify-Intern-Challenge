@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  
+    <!-- Using bootstrap to slightly improve UX -->
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- We need this to send request to our backend-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+  </head>
+
+  <body>
+
+  <!-- Cool Navbar -->
+  
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Super Cool Tracking System</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+    </ol>
+  </nav>
+
+  <!-- Small description of dashboard -->
+
+  <p>Within this dashboard you can add packages, edit them, delete them and view a list of them. Note that items will only appear after clicking the refresh items button! (Note that the product list will be a little squished if you arent viewing it in fullscreen) </p>
+
+  <p>When removing a product you can leave a comment and a user accountable for the deleting. If you re-add a deleted user the comments and the responsible user will be listed under the product. </p>
+
+  <p>The weather for each item is recaculated each time a request is made!</p>
+  <hr class="my-4">
+  <h4 class = "text-center">Data will go under me!</h4>
+      <h6 class = "text-center"> If an item is deleted, you cant use the "add item" button with a item that has the same UUID. If you want to use the UUID again you need to use the "add item back" button</h6>
+  <hr class="my-4">
+    
+  <div class="row" id = "products">
+
+  </div>
+    
+    
+  <hr class="my-4">
+    
+  <div class="container">
+
+    <!-- Input Fields  -->
+    
+    <form>
+      <div class="form-group">
+        <label>Product UUID</label>
+        <input class="form-control" value = "5d004f4a-d7e8-11ec-9d64-0242ac120002" id="Uuid">
+      </div>
+      <div class="form-group">
+        <label>Name of Product</label>
+        <input class="form-control" value="Custom Tie Dye Shirt" id="Name">
+        <small class="form-text text-muted">Used only when adding / editing an item</small>
+      </div>
+      <div class="form-group">
+        <label>Product Type</label>
+        <select id="PType" class="form-control">
+          <option>Awesome Shirt</option>
+          <option>Sick Jacket</option>
+          <option>Superb Hat</option>
+          <option>Swag Jeans</option>
+          <option>Ehh Not So Bad Socks</option>
+        </select>
+        <small class="form-text text-muted">Used only when adding / editing an item</small>
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <select id="City" class="form-control">
+          <option>Toronto</option>
+          <option>New York</option>
+          <option>Los Angeles</option>
+          <option>Berlin</option>
+          <option>Hong Kong</option>
+        </select>
+        <small class="form-text text-muted">Used only when adding / editing an item</small>
+      </div>
+      <div class="form-group">
+        <div class="form-group col-sm-6">
+          <label>Remove reason</label>
+          <input class="form-control" value = "Order Cancelled" id="Reason">
+          <small class="form-text text-muted">Used only for removing items</small>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Remover</label>
+          <input class="form-control" value="Jack (from product fulfillment)" id="Remover"">
+          <small class="form-text text-muted">Used only for removing items</small>
+      </div>
+      
+    </form>
+
+    <!-- Buttons Fields  -->
+    
+    <button id = "add" type="button" class="btn btn-success btn-lg btn-block" >Add Item</button>
+      
+    <button id = "edit" type="button" class="btn btn-primary btn-lg btn-block">Edit Item</button>
+      
+    <button id = "remove" type="button" class="btn btn-danger btn-lg btn-block">Remove Item</button>
+
+    <button id = "add-back" type="button" class="btn btn-info btn-lg btn-block">Add Item Back</button>
+
+    
+
+  </body>
+
+  <script>
+
+    /*
+        Function for taking the backend response and displaying it
+    */
+
+    function displayItem(item) {
+
+      /*
+         A product item will always have these generic features:
+      */
+      var spacing = document.createElement('div');
+      spacing.className = "col-sm-4";
+      var card = document.createElement('div');
+      card.className = "card";
+      card.style = "border:black; border-width:1px; border-style:solid;"
+      var cardbody = document.createElement('div');
+      cardbody.className = "card-body";
+      
+      var itemuuid = document.createElement('div');
+      itemuuid.className = "card-title";
+      itemuuid.innerHTML = "UUID: " + item.UUID;
+      var itemname = document.createElement('div');
+      itemname.className = "card-text";
+      itemname.innerHTML = "NAME: " + item.NAME;
+      var itemtype = document.createElement('div');
+      itemtype.className = "card-text";
+      itemtype.innerHTML = "TYPE: " + item.TYPE;
+
+      var hr1 = document.createElement('hr');
+      hr1.class = "my-4"
+      var city = document.createElement('div');
+      city.className = "card-text";
+      city.innerHTML = "CITY: " + item.CITY;
+      var weather = document.createElement('div');
+      weather.className = "card-text";
+      weather.innerHTML = "WEATHER: " + item.WEATHER;
+      
+    
+      cardbody.append(itemuuid);
+      cardbody.append(itemname);
+      cardbody.append(itemtype);
+
+      cardbody.append(hr1);
+      cardbody.append(city);
+      cardbody.append(weather);
+
+      // These features only exist if its already been deleted
+      if (item.REASON && item.REMOVER){
+        
+        var hr2 = document.createElement('hr');
+        hr2.class = "my-4"
+        var itemreason = document.createElement('div');
+        itemreason.className = "card-text";
+        itemreason.innerHTML = "DELETE REASON: " + item.REASON;
+        var itemremover = document.createElement('div');
+        itemremover.className = "card-text";
+        itemremover.innerHTML = "REMOVER: " + item.REMOVER;
+        
+        cardbody.append(hr2);
+        cardbody.append(itemreason);
+        cardbody.append(itemremover);
+      }
+      
+      card.append(cardbody);
+      spacing.append(card);
+
+      document.getElementById("products").append(spacing)
+      
+    }
+    
+    /*
+        Function for getting the data needed for a delete and storing it as a query
+    */
+    
+    function getDeleteData() {
+      var parameters = "UUID=" + document.getElementById("Uuid").value + "&" +"REASON=" + document.getElementById("Reason").value + "&" + "REMOVER=" + document.getElementById("Remover").value;
+      
+      return parameters
+    }
+
+    /*
+        Function for getting all the data and storing it as a query
+    */
+
+    function getData() {
+      var parameters = "UUID=" + document.getElementById("Uuid").value + "&" +"NAME=" + document.getElementById("Name").value + "&" + "TYPE=" + document.getElementById("PType").value + "&" + "CITY=" + document.getElementById("City").value;
+      
+      return parameters
+    }
+
+    /*
+        Function sending data to our backend
+    */
+    
+    function getAsync(url, params) {
+      var xmlHttp = new XMLHttpRequest();
+  
+      xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState === 4) {
+          document.getElementById("products").innerHTML = null
+          var values = JSON.parse(xmlHttp.response);
+          for (var i=0;i<values.length;i++) {
+            if (values[i] != null)
+              displayItem(values[i])
+         }
+        }
+      }
+      
+      xmlHttp.open("get", url + "?" + params, true);
+      xmlHttp.send();
+      
+    }
+
+    /*
+        When button is clicked send a request to backend
+    */
+    
+    $(document).ready(function(){
+
+      // On page load fetch the current list of users
+      document.getElementById("products").innerHTML = null;
+      getAsync("/API/get-users", "");
+      
+      $("#add").click(function(){ 
+        getAsync("API/add-user", getData());
+      });
+      $("#edit").click(function(){ 
+        getAsync("API/edit-user", getData());
+      });
+      $("#remove").click(function(){ 
+        getAsync("API/remove-user", getDeleteData());
+      });
+      $("#add-back").click(function(){ 
+        getAsync("API/add-user-back", getData());
+      });
+    })
+    
+  </script>
+</html>
