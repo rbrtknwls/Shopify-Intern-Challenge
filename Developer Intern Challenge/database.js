@@ -6,6 +6,8 @@ The idea here was to make an ADT, to mimic what exists in the real world where d
 var database = []
 var deleted_users = []
 
+const weather = require('./weather');
+
 module.exports = {
   
   /*
@@ -56,6 +58,7 @@ module.exports = {
         var updated_user = user;
         updated_user["NAME"] = current.NAME;
         updated_user["TYPE"] = current.TYPE;
+        updated_user["CITY"] = current.CITY;
         
         deleted_users.push(updated_user); 
       }
@@ -94,6 +97,8 @@ module.exports = {
 
         current.NAME = user.NAME;
         current.TYPE = user.TYPE;
+        current.CITY = user.CITY;
+        
       }
       accumulator.push(current);
       return accumulator
@@ -102,14 +107,13 @@ module.exports = {
 
   /*
     Function for returning a list of users
-    Time Complexity: ~O(1)
+    Time Complexity: ~O(n?) 
   */
 
-  get_users: function () {
-    console.log("exs");
+  get_users: async function () {
+    
+    await weather.update_city_weather(database);
     console.log(database);
-    console.log("Del");
-    console.log(deleted_users);
-    return database;
+    return(database);
   }
 };
