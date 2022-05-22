@@ -1,4 +1,4 @@
-(The project is currently being hosted on Replit at: https://healthyruralscreenscraper.rbrtknwls.repl.co/)
+(The project is currently being hosted on Replit at: https://generousfloralwhitemetadata.rbrtknwls.repl.co/)
 
 # Running the Project Locally
 Once you have finished cloning the repo, you have to run the following commands:
