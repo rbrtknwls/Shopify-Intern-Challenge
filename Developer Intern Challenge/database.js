@@ -112,8 +112,6 @@ module.exports = {
 
   get_users: async function () {
     
-    await weather.update_city_weather(database);
-    console.log(database);
     return(database);
   }
 };
